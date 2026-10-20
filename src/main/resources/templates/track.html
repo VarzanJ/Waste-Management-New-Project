@@ -1,0 +1,199 @@
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#145c3a">
+    <title>Track Waste Report | EcoSmart</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header class="topbar">
+    <a class="brand" th:href="@{/}">♻ EcoSmart</a>
+    <span class="header-title">Report Tracking Centre</span>
+
+    <nav class="topbar-actions">
+        <a class="admin-login-link" th:href="@{/}">← Back to Home</a>
+
+        <button id="themeToggle" class="theme-toggle"
+                type="button" aria-label="Toggle dark and light theme">
+            🌙 Dark Mode
+        </button>
+    </nav>
+</header>
+
+<!-- Fixed welcome section -->
+<section class="welcome">
+    <div>
+        <p class="eyebrow">TRANSPARENT COLLECTION PROCESS</p>
+        <h1>Track Your Waste Report</h1>
+        <p>
+            Stay informed about your waste collection progress.
+            Enter your unique Tracking ID to view the latest status.
+        </p>
+    </div>
+
+    <div class="eco-icon" aria-hidden="true">📍</div>
+</section>
+
+<!-- Only content below this section scrolls -->
+<div class="page-scroll">
+    <main class="container">
+
+        <section class="panel track-search">
+
+            <h2>Find Your Report</h2>
+
+            <p class="muted">
+                Use the Tracking ID provided when you submitted your report.
+            </p>
+
+            <form th:action="@{/track/search}"
+                  method="get"
+                  id="trackingForm">
+
+                <label for="trackingId">Tracking ID</label>
+
+                <input type="text"
+                       id="trackingId"
+                       name="trackingId"
+                       placeholder="Paste your Tracking ID here"
+                       th:value="${trackingId}"
+                       maxlength="36"
+                       autocomplete="off"
+                       required>
+
+                <button class="primary-btn" type="submit">
+                    🔎 Track Report
+                </button>
+
+            </form>
+
+            <div class="message error"
+                 th:if="${error}"
+                 role="alert"
+                 th:text="${error}"></div>
+
+        </section>
+
+        <section class="panel records-panel" th:if="${report != null}">
+
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">REPORT INFORMATION</p>
+                    <h2>Report Details</h2>
+                    <p class="muted">
+                        Review the information and collection status.
+                    </p>
+                </div>
+
+                <span class="status"
+                      th:text="${report.status}"
+                      th:classappend="${report.status == 'Collected'
+                      ? ' collected'
+                      : (report.status == 'In Progress'
+                      ? ' in-progress' : ' pending')}">
+                </span>
+            </div>
+
+            <div class="report-details">
+
+                <p>
+                    <strong>Tracking ID</strong><br>
+                    <span class="tracking-id"
+                          th:text="${report.trackingId}"></span>
+                </p>
+
+                <p>
+                    <strong>Waste Category</strong><br>
+                    <span th:text="${report.wasteType}"></span>
+                </p>
+
+                <p>
+                    <strong>Quantity</strong><br>
+                    <span th:text="${report.quantityKg}"></span> kg
+                </p>
+
+                <p>
+                    <strong>Collection Location</strong><br>
+                    <span th:text="${report.location}"></span>
+                </p>
+
+                <p>
+                    <strong>Submission Date</strong><br>
+                    <span th:text="${report.reportDate}"></span>
+                </p>
+
+                <p>
+                    <strong>Current Status</strong><br>
+                    <span class="status"
+                          th:text="${report.status}"
+                          th:classappend="${report.status == 'Collected'
+                          ? ' collected'
+                          : (report.status == 'In Progress'
+                          ? ' in-progress' : ' pending')}">
+                    </span>
+                </p>
+
+            </div>
+
+            <h2 class="timeline-heading">Collection Journey</h2>
+
+            <p class="muted">
+                Follow the progress of your waste report.
+            </p>
+
+            <div class="tracking-timeline">
+
+                <div class="timeline-step active">
+                    <div class="timeline-icon">✓</div>
+
+                    <div class="timeline-content">
+                        <strong>Report Submitted</strong>
+                        <p>
+                            Your waste report has been successfully received.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-step"
+                     th:classappend="${report.status == 'In Progress'
+                     or report.status == 'Collected'} ? ' active' : ''">
+
+                    <div class="timeline-icon">2</div>
+
+                    <div class="timeline-content">
+                        <strong>Collection In Progress</strong>
+                        <p>The waste collection process has started.</p>
+                    </div>
+                </div>
+
+                <div class="timeline-step"
+                     th:classappend="${report.status == 'Collected'}
+                     ? ' active' : ''">
+
+                    <div class="timeline-icon">3</div>
+
+                    <div class="timeline-content">
+                        <strong>Waste Collected</strong>
+                        <p>Your reported waste has been collected.</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <footer>
+            <p>♻ EcoSmart Waste Management System · Building a cleaner future</p>
+        </footer>
+
+    </main>
+</div>
+
+<script th:src="@{/js/app.js}"></script>
+
+</body>
+</html>

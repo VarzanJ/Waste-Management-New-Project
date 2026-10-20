@@ -1,0 +1,111 @@
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#145c3a">
+    <title>EcoSmart | Admin Login</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header class="topbar">
+    <a class="brand" th:href="@{/}">♻ EcoSmart</a>
+    <span class="header-title">Administrator Portal</span>
+
+    <nav class="topbar-actions">
+        <a class="admin-login-link" th:href="@{/}">← Home</a>
+
+        <button id="themeToggle" class="theme-toggle"
+                type="button" aria-label="Toggle dark and light theme">
+            🌙 Dark Mode
+        </button>
+    </nav>
+</header>
+
+<!-- Fixed welcome section -->
+<section class="welcome">
+    <div>
+        <p class="eyebrow">SECURE ADMINISTRATION</p>
+        <h1>Welcome Back</h1>
+        <p>Sign in to manage waste reports and monitor collection activities.</p>
+    </div>
+    <div class="eco-icon" aria-hidden="true">🔐</div>
+</section>
+
+<!-- Scrollable content -->
+<div class="page-scroll">
+    <main class="container">
+
+        <section class="panel login-panel">
+
+            <div class="eco-icon" aria-hidden="true">♻️</div>
+
+            <h2>Admin Login</h2>
+
+            <p class="muted">
+                Enter your administrator credentials to continue.
+            </p>
+
+            <p class="message error"
+               th:if="${param.error}"
+               role="alert">
+                Invalid username or password. Please try again.
+            </p>
+
+            <p class="message success"
+               th:if="${param.logout}"
+               role="status">
+                You have logged out successfully.
+            </p>
+
+            <form th:action="@{/login}" method="post">
+
+                <label for="username">Username</label>
+
+                <input id="username"
+                       name="username"
+                       type="text"
+                       placeholder="Enter your username"
+                       autocomplete="username"
+                       maxlength="100"
+                       required
+                       autofocus>
+
+                <label for="password">Password</label>
+
+                <input id="password"
+                       name="password"
+                       type="password"
+                       placeholder="Enter your password"
+                       autocomplete="current-password"
+                       required>
+
+                <button class="primary-btn" type="submit">
+                    Sign In →
+                </button>
+
+            </form>
+
+            <p class="muted">
+                🔒 Your administrator account is protected.
+            </p>
+
+            <p class="back-link">
+                <a th:href="@{/}">← Back to EcoSmart Home</a>
+            </p>
+
+        </section>
+
+        <footer>
+            <p>♻ EcoSmart Waste Management System · Building a cleaner future</p>
+        </footer>
+
+    </main>
+</div>
+
+<script th:src="@{/js/app.js}"></script>
+
+</body>
+</html>

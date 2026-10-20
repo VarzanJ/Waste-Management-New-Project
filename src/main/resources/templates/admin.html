@@ -1,0 +1,270 @@
+```html
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoSmart | Admin Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header class="topbar">
+    <a class="brand" th:href="@{/}">♻ EcoSmart</a>
+    <span class="header-title">Admin Dashboard</span>
+
+    <nav class="topbar-actions">
+        <a class="admin-login-link" th:href="@{/}">Public Home</a>
+        <a class="admin-login-link" th:href="@{/admin/reports/export}">Export CSV</a>
+
+        <form th:action="@{/logout}" method="post" class="logout-form">
+            <button type="submit" class="theme-toggle">Logout</button>
+        </form>
+
+        <button id="themeToggle" class="theme-toggle"
+                type="button" aria-label="Toggle dark and light theme">
+            🌙 Dark Mode
+        </button>
+    </nav>
+</header>
+
+<!-- Fixed welcome section -->
+<section class="welcome">
+    <div>
+        <p class="eyebrow">ADMINISTRATION</p>
+        <h1>Waste Report Management</h1>
+        <p>Review reports, manage collection progress and export records.</p>
+    </div>
+    <div class="eco-icon" aria-hidden="true">📊</div>
+</section>
+
+<!-- Only this section scrolls -->
+<div class="page-scroll">
+
+    <main class="container">
+
+        <div class="message success" th:if="${success}"
+             role="status" th:text="${success}"></div>
+
+        <div class="message error" th:if="${error}"
+             role="alert" th:text="${error}"></div>
+
+        <section class="stats">
+            <article class="stat-card">
+                <span>Total Reports</span>
+                <h2 th:text="${totalReports}">0</h2>
+                <small>All stored reports</small>
+            </article>
+
+            <article class="stat-card">
+                <span>Total Waste</span>
+                <h2>
+                    <span th:text="${#numbers.formatDecimal(totalKg, 1, 2)}">0.00</span> kg
+                </h2>
+                <small>Total reported quantity</small>
+            </article>
+
+            <article class="stat-card">
+                <span>Pending</span>
+                <h2 th:text="${pending}">0</h2>
+                <small>Awaiting collection</small>
+            </article>
+
+            <article class="stat-card">
+                <span>In Progress</span>
+                <h2 th:text="${inProgress}">0</h2>
+                <small>Currently being processed</small>
+            </article>
+
+            <article class="stat-card">
+                <span>Collected</span>
+                <h2 th:text="${collected}">0</h2>
+                <small>Collection completed</small>
+            </article>
+        </section>
+
+        <section class="content-grid">
+            <article class="panel">
+                <h2>Waste Category Overview</h2>
+                <div class="chart-wrap">
+                    <canvas id="wasteChart"
+                            aria-label="Waste report categories chart"
+                            role="img"></canvas>
+                </div>
+            </article>
+
+            <article class="panel">
+                <h2>Manage Reports</h2>
+                <p class="muted">
+                    Use filters to find a report. Status updates and deletion
+                    are available here to administrators.
+                </p>
+                <p><strong>Pending:</strong> Waiting for collection</p>
+                <p><strong>In Progress:</strong> Collection process started</p>
+                <p><strong>Collected:</strong> Collection completed</p>
+            </article>
+        </section>
+
+        <section class="panel records-panel">
+            <div class="section-heading">
+                <div>
+                    <h2>Waste Reports</h2>
+                    <p class="muted">Filtered records are shown below.</p>
+                </div>
+            </div>
+
+            <form th:action="@{/admin}" method="get" class="filter-form">
+                <input type="search" name="location"
+                       placeholder="Search location"
+                       aria-label="Filter by location"
+                       th:value="${filterLocation}">
+
+                <select name="wasteType" aria-label="Filter by waste type">
+                    <option value="">All waste types</option>
+                    <option value="Organic"
+                            th:selected="${filterWasteType == 'Organic'}">Organic</option>
+                    <option value="Plastic"
+                            th:selected="${filterWasteType == 'Plastic'}">Plastic</option>
+                    <option value="Paper"
+                            th:selected="${filterWasteType == 'Paper'}">Paper</option>
+                    <option value="Metal"
+                            th:selected="${filterWasteType == 'Metal'}">Metal</option>
+                    <option value="Other"
+                            th:selected="${filterWasteType == 'Other'}">Other</option>
+                </select>
+
+                <select name="status" aria-label="Filter by collection status">
+                    <option value="">All statuses</option>
+                    <option value="Pending"
+                            th:selected="${filterStatus == 'Pending'}">Pending</option>
+                    <option value="In Progress"
+                            th:selected="${filterStatus == 'In Progress'}">In Progress</option>
+                    <option value="Collected"
+                            th:selected="${filterStatus == 'Collected'}">Collected</option>
+                </select>
+
+                <button class="primary-btn filter-btn" type="submit">
+                    Apply Filters
+                </button>
+                <a class="secondary-btn" th:href="@{/admin}">Clear Filters</a>
+            </form>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Waste Type</th>
+                        <th>Quantity</th>
+                        <th>Location</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Manage</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+                    <tr th:each="report : ${reports}">
+                        <td th:text="${report.id}"></td>
+                        <td th:text="${report.wasteType}"></td>
+                        <td>
+                            <span th:text="${report.quantityKg}"></span> kg
+                        </td>
+                        <td th:text="${report.location}"></td>
+                        <td th:text="${report.reportDate}"></td>
+
+                        <td>
+                            <span class="status"
+                                  th:text="${report.status}"
+                                  th:classappend="${report.status == 'Collected'
+                                  ? ' collected'
+                                  : (report.status == 'In Progress'
+                                  ? ' in-progress' : ' pending')}">
+                            </span>
+                        </td>
+
+                        <td class="actions">
+                            <form th:if="${report.status == 'Pending'}"
+                                  th:action="@{/reports/{id}/status(id=${report.id})}"
+                                  method="post">
+                                <input type="hidden" name="status" value="In Progress">
+                                <button class="small-btn" type="submit">
+                                    Start Progress
+                                </button>
+                            </form>
+
+                            <form th:if="${report.status != 'Collected'}"
+                                  th:action="@{/reports/{id}/status(id=${report.id})}"
+                                  method="post">
+                                <input type="hidden" name="status" value="Collected">
+                                <button class="small-btn" type="submit">
+                                    Mark Collected
+                                </button>
+                            </form>
+
+                            <form th:action="@{/reports/{id}/delete(id=${report.id})}"
+                                  method="post" class="delete-form">
+                                <button class="small-btn delete-btn" type="submit">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+
+                    <tr th:if="${#lists.isEmpty(reports)}">
+                        <td class="empty" colspan="7">
+                            No reports match the selected filters.
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <footer>
+            <p>EcoSmart Administration</p>
+        </footer>
+
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script th:inline="javascript">
+    const categoryLabels = [[${categoryLabels}]];
+    const categoryValues = [[${categoryValues}]];
+
+    const chartCanvas = document.getElementById("wasteChart");
+
+    if (chartCanvas && typeof Chart !== "undefined") {
+        new Chart(chartCanvas, {
+            type: "doughnut",
+            data: {
+                labels: categoryLabels,
+                datasets: [{
+                    data: categoryValues,
+                    backgroundColor: [
+                        "#2e8b57", "#f0a43c", "#4285f4",
+                        "#8e63ce", "#85929e"
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "bottom"
+                    }
+                }
+            }
+        });
+    }
+</script>
+
+<script th:src="@{/js/app.js}"></script>
+
+</body>
+</html>
+```
