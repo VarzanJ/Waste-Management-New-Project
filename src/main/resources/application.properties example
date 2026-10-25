@@ -2,7 +2,8 @@ spring.application.name=ecosmart
 
 spring.datasource.url=jdbc:mysql://localhost:3306/ecosmart
 spring.datasource.username=root
-spring.datasource.password=Juni@12345varzan
+spring.datasource.password=*******
+
 
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
