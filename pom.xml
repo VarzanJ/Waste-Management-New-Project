@@ -55,13 +55,15 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        
 		<!-- Spring Security for Admin Login and Access Control -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-security</artifactId>
-</dependency>
 
+<dependency>
+    <groupId>org.springframework.security</groupId>
+    <artifactId>spring-security-crypto</artifactId>
+</dependency>
     </dependencies>
+    
 
     <build>
         <plugins>
